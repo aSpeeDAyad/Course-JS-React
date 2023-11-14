@@ -1,0 +1,24 @@
+
+const someString = 'Vova doesn`t go to school';
+
+function reverse(str) {
+    if (typeof(str) != 'string'){
+        return(console.log('Error'));
+    }
+    else{        
+        let strInArr = str.split('');
+        let simpleWord =  strInArr[0].toLowerCase();
+        let lastWord = strInArr[strInArr.length -1];
+        let mainLatter = lastWord[0].toUpperCase(); 
+        let newLastWord = mainLatter + lastWord.slice(1);
+        strInArr.pop();
+        strInArr.push(newLastWord);
+        let revStrInArr = strInArr.reverse();
+        revStrInArr.pop();
+        revStrInArr.push(simpleWord);
+        let backToStrRevStrInArr = revStrInArr.join('');
+        return(console.log(backToStrRevStrInArr));
+
+    }
+}
+reverse(someString);

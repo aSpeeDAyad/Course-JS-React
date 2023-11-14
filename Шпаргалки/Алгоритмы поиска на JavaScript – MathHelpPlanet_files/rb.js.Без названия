@@ -1,0 +1,244 @@
+var _____WB$wombat$assign$function_____ = function(name) {return (self._wb_wombat && self._wb_wombat.local_init && self._wb_wombat.local_init(name)) || self[name]; };
+if (!self.__WB_pmw) { self.__WB_pmw = function(obj) { this.__WB_source = obj; return this; } }
+{
+  let window = _____WB$wombat$assign$function_____("window");
+  let self = _____WB$wombat$assign$function_____("self");
+  let document = _____WB$wombat$assign$function_____("document");
+  let location = _____WB$wombat$assign$function_____("location");
+  let top = _____WB$wombat$assign$function_____("top");
+  let parent = _____WB$wombat$assign$function_____("parent");
+  let frames = _____WB$wombat$assign$function_____("frames");
+  let opener = _____WB$wombat$assign$function_____("opener");
+
+window.load_rb = window.load_rb || function(element, url, w, h) {
+    element.innerHTML = "<iframe src='" + url + "' scrolling='no' marginwidth='0' marginheight='0' style='border:0;vertical-align:bottom;width:" + w + "px;height:" + h + "px'></iframe>";
+};
+
+window.load_ni_rb = window.load_ni_rb || function(element, url, w, h) {
+    var oReq = new XMLHttpRequest();
+    oReq.onload = function (res) {
+        if (oReq.status === 200) {
+            try {
+                element.innerHTML = oReq.response;
+                runScripts(element);
+            } catch (e){}
+        }
+    };
+    oReq.open("get",url, true);
+    oReq.send();
+};
+
+window.show_ni_rb = window.show_ni_rb || function (url, id, w, h, rKey) {
+    show_d_rb(url, id, w, h, rKey, false);
+};
+
+window.show_rb = window.show_rb || function (url, id, w, h, rKey) {
+    show_d_rb(url, id, w, h, rKey, true);
+};
+
+window.show_d_rb = window.show_d_rb || function (url, id, w, h, rKey, iframe) {
+    url = "https://web.archive.org/web/20210331165113/https://tg.rktch.com/v0";
+    if (typeof url === 'undefined') {
+        return;
+    }
+    var unique = id + "" + rKey;
+
+    var position = "";
+    var element = document.getElementById(unique);
+    if(element !== null && typeof element !== 'undefined') {
+        try {
+            var size = getOffset(element);
+            var scrollY = window.pageYOffset;
+            var upper = size.top - h / 2;
+            var screenCenter = scrollY + (window.innerHeight / 2);
+            if (screenCenter < upper) {
+                position = 3; //below
+            } else {
+                position = 1; //above
+            }
+            position = "&p=" + position || "";
+        } catch (e) {
+        }
+
+        var vw = "&vw=" + window.innerWidth;
+        var vh = "&vh=" + window.innerHeight;
+        var sw = "&sw=" + screen.width;
+        var sh = "&sh=" + screen.height;
+        var rk = "&rk=" + rKey;
+
+        var base = url + "?i=" + id + position + vw + vh + sw + sh + rk;
+ 	if (window.location && window.location !== ""){
+	   base += "&url=" + encodeURIComponent(window.location);
+	}
+	var parentBlock = document.getElementById(unique);
+	if (parentBlock) {
+           var siteid = parentBlock.dataset.siteid;
+	   if (siteid) {
+		base += "&siteid=" + siteid;
+	   }
+	}
+        if (iframe === true) {
+            window.load_rb(element, base, w, h);
+        } else {
+            window.load_ni_rb(element, base, w, h);
+        }
+
+        window['no' + unique] = window['no' + unique] || function () {
+        };
+        window['win' + unique] = window['win' + unique] || function (cpm) {
+        };
+
+        window.addEventListener('message', function (event) {
+	    var origin = getOrigin(url);
+            // if (~event.origin.indexOf(origin) && event.data.i === id) {
+            if (event.data.i === id) {
+                if (event.data.s === 0) {
+                    window['no' + event.data.i + event.data.rk] && window['no' + event.data.i + event.data.rk]();
+                    if(event.data.na !== null && typeof event.data.na !== 'undefined') {
+                        try {
+                            var div = event.data.na.replace("\\\'", "\'");
+                            element.innerHTML = div;
+                            runScripts(element);
+                        } catch (e) {
+                            if (window.location.href.indexOf('rbdbg') !== -1) {console.log(e);}
+                        }
+                    }
+                } else if (event.data.s === 1) {
+		    window.postMessage({"win":unique}, '*');
+                    window['win' + event.data.i + event.data.rk] && window['win' + event.data.i + event.data.rk](event.data.c);
+                    var refresh = event.data.r;
+                   // if (refresh) {
+                     //   setTimeout(function () {
+			//	if (iframe === true) {
+           		//	 window.load_rb(element, base, w, h);
+       			//	 } else {
+           		//	 window.load_ni_rb(element, base, w, h);
+			  //      }
+
+
+                            //window.load_rb(element, base, w, h)
+                        //}, refresh)
+                    //}
+                }
+            }
+        });
+    }
+};
+
+
+function seq (arr, callback, index) {
+    if (typeof index === 'undefined') {
+        index = 0
+    }
+
+    arr[index](function () {
+        index++;
+        if (index === arr.length) {
+            callback()
+        } else {
+            seq(arr, callback, index)
+        }
+    })
+}
+
+function insertScript ($script, callback) {
+    var s = document.createElement('script')
+    s.type = 'text/javascript';
+    if ($script.src) {
+        s.onload = callback;
+        s.onerror = callback;
+        s.src = $script.src;
+    } else {
+        s.textContent = $script.innerText;
+    }
+
+    try {
+        document.head.appendChild(s);
+    } catch(e) {
+        //	document.head.appendChild(s);
+    }
+    //document.head.appendChild(s);
+
+    $script.parentNode.removeChild($script);
+
+    if (!$script.src) {
+        callback()
+    }
+}
+
+function runScripts ($container) {
+    var $scripts = $container.querySelectorAll('script');
+    var runList = [];
+    var typeAttr;
+
+    [].forEach.call($scripts, function ($script) {
+        typeAttr = $script.getAttribute('type');
+
+        runList.push(function (callback) {
+            insertScript($script, callback)
+        })
+    });
+
+    seq(runList, function(){})
+}
+
+function getOrigin(url) {
+    var arr = url.split("/");
+    return arr[0] + "//" + arr[2].split("?")[0];
+}
+
+function getOffset(elem) {
+    if (elem.getBoundingClientRect) {
+        return getOffsetRect(elem)
+    } else {
+        return getOffsetSum(elem)
+    }
+}
+
+function getOffsetRect(elem) {
+    var box = elem.getBoundingClientRect();
+    var body = document.body;
+    var docElem = document.documentElement;
+    var scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop;
+    var scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft;
+    var clientTop = docElem.clientTop || body.clientTop || 0;
+    var clientLeft = docElem.clientLeft || body.clientLeft || 0;
+    var top = box.top + scrollTop - clientTop;
+    var left = box.left + scrollLeft - clientLeft;
+
+    return {top: Math.round(top), left: Math.round(left)}
+}
+
+function getOffsetSum(elem) {
+    var top = 0, left = 0;
+    while (elem) {
+        top = top + parseFloat(elem.offsetTop);
+        left = left + parseFloat(elem.offsetLeft);
+        elem = elem.offsetParent;
+    }
+
+    return {top: Math.round(top), left: Math.round(left)}
+}
+
+
+}
+/*
+     FILE ARCHIVED ON 16:51:13 Mar 31, 2021 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 18:57:17 Nov 08, 2023.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+*/
+/*
+playback timings (ms):
+  captures_list: 154.146
+  exclusion.robots: 0.067
+  exclusion.robots.policy: 0.06
+  cdx.remote: 0.056
+  esindex: 0.009
+  LoadShardBlock: 65.829 (3)
+  PetaboxLoader3.datanode: 105.602 (5)
+  load_resource: 176.188 (2)
+  PetaboxLoader3.resolve: 89.788 (2)
+*/
